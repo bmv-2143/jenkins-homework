@@ -1,0 +1,84 @@
+# Anton Kazakov's slightly modified sample
+FROM ubuntu:22.04
+
+ENV VERSION_SDK_TOOLS "11076708_latest"
+ENV ANDROID_SDK_ROOT "/sdk"
+ENV VERSION_GRADLE_PROFILER "0.21.0"
+ENV GRADLE_PROFILER "/gradle-profiler/gradle-profiler-${VERSION_GRADLE_PROFILER}"
+ENV PATH "$PATH:${ANDROID_SDK_ROOT}/tools:${GRADLE_PROFILER}/bin"
+ENV DEBIAN_FRONTEND noninteractive
+ENV LANG 'en_US.UTF-8'
+ENV LANGUAGE 'en_US:en'
+ENV LC_ALL 'en_US.UTF-8'
+ENV ZONE "jenkins_agent"
+ENV VERSION_BUNDLE_TOOL "1.16.0"
+ENV BUNDLE_TOOL "bundletool.jar"
+
+USER root
+
+RUN apt-get update && \
+    apt-get install -y build-essential devscripts openjdk-17-jdk
+
+RUN  apt-get update && \
+     apt-get install --yes \
+     xvfb libz1 libstdc++6 \
+     libcurl4-openssl-dev libglu1-mesa libxi-dev libxmu-dev \
+     libglu1-mesa-dev
+
+RUN apt-get -qq update && \
+  apt-get install -qqy --no-install-recommends \
+  ca-certificates \
+  bzip2 \
+  curl \
+  openssl \
+  git-core \
+  html2text \
+  unzip \
+  locales \
+  rsync \
+  openssh-server \
+  iputils-ping \
+  wget \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN mkdir gradle-profiler
+
+RUN wget -q https://github.com/gradle/gradle-profiler/archive/refs/tags/v${VERSION_GRADLE_PROFILER}.zip \
+    -O gradle-profiler/gradle-profiler-${VERSION_GRADLE_PROFILER}.zip
+
+RUN wget -q https://github.com/google/bundletool/releases/download/${VERSION_BUNDLE_TOOL}/bundletool-all-${VERSION_BUNDLE_TOOL}.jar \
+  -O ${BUNDLE_TOOL}
+
+RUN echo "export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" | cat - ~/.bashrc >> temp && mv temp ~/.bashrc
+
+RUN unzip gradle-profiler/gradle-profiler-${VERSION_GRADLE_PROFILER}.zip -d gradle-profiler && \
+  rm -v gradle-profiler/gradle-profiler-${VERSION_GRADLE_PROFILER}.zip
+
+RUN curl -s https://dl.google.com/android/repository/commandlinetools-linux-${VERSION_SDK_TOOLS}.zip > /sdk.zip && \
+  mkdir -p /sdk/cmdline-tools && \
+  unzip /sdk.zip -d /sdk && \
+  rm -v /sdk.zip
+
+ADD packages.txt /sdk
+
+RUN mkdir -p /root/.android
+RUN touch /root/.android/repositories.cfg
+
+RUN yes | ${ANDROID_SDK_ROOT}/cmdline-tools/bin/sdkmanager --licenses --sdk_root=$ANDROID_SDK_ROOT
+
+RUN ${ANDROID_SDK_ROOT}/cmdline-tools/bin/sdkmanager --package_file=/sdk/packages.txt --verbose --sdk_root=$ANDROID_SDK_ROOT
+
+RUN ${ANDROID_SDK_ROOT}/cmdline-tools/bin/sdkmanager --update --sdk_root=$ANDROID_SDK_ROOT
+
+RUN ${ANDROID_SDK_ROOT}/cmdline-tools/bin/sdkmanager --list --verbose --sdk_root=$ANDROID_SDK_ROOT
+
+
+RUN groupadd -g 1000 -r jenkins && \
+  groupadd -g 999 -r docker && \
+  groupadd -g 994 -r dockerroot && \
+  useradd --create-home -d "/home/jenkins" -u 1000 -r -g jenkins -G docker,dockerroot jenkins
+
+RUN chown -R jenkins $ANDROID_SDK_ROOT
+
+# switch to user jenkins
+USER jenkins
