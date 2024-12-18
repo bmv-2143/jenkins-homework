@@ -1,0 +1,127 @@
+#!groovy
+pipeline {
+    agent {
+        docker {
+            image 'img-jenkins-agent-android-builder'
+        }
+    }
+
+    parameters {
+        string(name: 'branch', defaultValue: 'develop', description: 'Branch to build (develop/release)')
+    }
+
+    stages {
+        stage('validate parameters') {
+            steps {
+                script {
+                    if (!params.branch?.trim()) {
+                        error("Parameter 'branch' is empty or undefined.")
+                    }
+                }
+            }
+        }
+
+        stage('prepare workspace') {
+            steps {
+                echo "Cleaning workspace..."
+                cleanWs()
+            }
+        }
+
+        stage('checkout') {
+            steps {
+                echo "Checking out branch: ${params.branch}"
+                checkout([
+                        $class           : 'GitSCM',
+                        branches         : [[name: "*/${params.branch}"]],
+                        extensions       : [],
+                        userRemoteConfigs: [[url: 'https://github.com/bmv-2143/jenkins-empty-multibranch-app.git']]
+                ])
+            }
+        }
+
+        stage("init") {
+            steps {
+                echo "Initializing project..."
+                sh "chmod +x gradlew"
+                sh "./gradlew --version"
+            }
+        }
+
+        stage('unsupported branch') {
+            when {
+                not {
+                    anyOf {
+                        expression { params.branch == 'develop' }
+                        expression { params.branch == 'release' }
+                    }
+                }
+            }
+            steps {
+                echo "Branch '${params.branch}' is not supported. No build steps will be executed."
+            }
+        }
+
+        stage('buildDevelop') {
+            when {
+                expression { params.branch == 'develop' }
+            }
+            steps {
+                echo "Running lint check for Debug..."
+                sh "./gradlew lintDebug"
+
+                echo "Running tests for develop branch..."
+                sh "./gradlew testDebugUnitTest"
+
+                echo "Build develop..."
+                sh "./gradlew assembleDebug"
+
+                echo "Upload development build to internal testers..."
+                sh "./gradlew uploadToTelegramForInternalTesting"
+            }
+        }
+
+        stage('buildRelease') {
+            when {
+                expression { params.branch == 'release' }
+            }
+            steps {
+                echo "Running unit tests for release branch..."
+                sh "./gradlew testReleaseUnitTest"
+
+                echo "Build release..."
+                sh "./gradlew assembleRelease"
+
+                script {
+                    def releaseManager = input(
+                            message: "Confirm release upload to Play Store",
+                            ok: "Approve",
+                            parameters: [
+                                    string(name: 'RELEASE_MANAGER', description: 'Name of release manager approving this upload')
+                            ]
+                    )
+                    echo "Release approved by: ${releaseManager}"
+                }
+
+
+
+                echo "Upload release to Play store..."
+                sh "./gradlew uploadToGooglePlayStore"
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Archiving reports..."
+            archiveArtifacts(artifacts: '**/build/reports/**', allowEmptyArchive: true)
+            echo "Build completed."
+        }
+        failure {
+            echo "Build failed!"
+        }
+        success {
+            echo "Build succeeded!"
+        }
+    }
+}
