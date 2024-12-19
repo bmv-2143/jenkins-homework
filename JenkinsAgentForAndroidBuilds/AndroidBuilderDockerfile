@@ -43,16 +43,18 @@ RUN apt-get -qq update && \
 
 RUN mkdir gradle-profiler
 
-RUN wget -q https://github.com/gradle/gradle-profiler/archive/refs/tags/v${VERSION_GRADLE_PROFILER}.zip \
+RUN wget -q https://repo1.maven.org/maven2/org/gradle/profiler/gradle-profiler/${VERSION_GRADLE_PROFILER}/gradle-profiler-${VERSION_GRADLE_PROFILER}.zip \
     -O gradle-profiler/gradle-profiler-${VERSION_GRADLE_PROFILER}.zip
 
 RUN wget -q https://github.com/google/bundletool/releases/download/${VERSION_BUNDLE_TOOL}/bundletool-all-${VERSION_BUNDLE_TOOL}.jar \
   -O ${BUNDLE_TOOL}
 
-RUN echo "export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" | cat - ~/.bashrc >> temp && mv temp ~/.bashrc
-
 RUN unzip gradle-profiler/gradle-profiler-${VERSION_GRADLE_PROFILER}.zip -d gradle-profiler && \
   rm -v gradle-profiler/gradle-profiler-${VERSION_GRADLE_PROFILER}.zip
+
+RUN ln -s /gradle-profiler/gradle-profiler-${VERSION_GRADLE_PROFILER}/bin/gradle-profiler /usr/local/bin/gradleprofiler
+
+RUN echo "export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" | cat - ~/.bashrc >> temp && mv temp ~/.bashrc
 
 RUN curl -s https://dl.google.com/android/repository/commandlinetools-linux-${VERSION_SDK_TOOLS}.zip > /sdk.zip && \
   mkdir -p /sdk/cmdline-tools && \
