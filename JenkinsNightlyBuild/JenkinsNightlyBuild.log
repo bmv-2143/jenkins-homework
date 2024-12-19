@@ -1,0 +1,162 @@
+Started by timer
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins
+ in /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler
+[Pipeline] {
+[Pipeline] isUnix
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] sh
++ docker inspect -f . img-jenkins-agent-android-builder
+.
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] withDockerContainer
+Jenkins seems to be running inside container 7d968e8634c0ff101f47f1c7057dffc8bfbc8425edc0d4a1aafb6419bca0b08e
+$ docker run -t -d -u 1000:1000 -w /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler --volumes-from 7d968e8634c0ff101f47f1c7057dffc8bfbc8425edc0d4a1aafb6419bca0b08e -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** img-jenkins-agent-android-builder cat
+$ docker top b3a249810b19a67c3bca9168e58b6aa4169ae5c33579fb49474c86a37e50c9b3 -eo pid,comm
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (prepare workspace)
+[Pipeline] echo
+Cleaning workspace...
+[Pipeline] cleanWs
+[WS-CLEANUP] Deleting project workspace...
+[WS-CLEANUP] Deferred wipeout is used...
+[WS-CLEANUP] done
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (checkout)
+[Pipeline] echo
+Checking out branch: null
+[Pipeline] checkout
+The recommended git tool is: NONE
+No credentials specified
+Warning: JENKINS-30600: special launcher org.jenkinsci.plugins.docker.workflow.WithContainerStep$Decorator$1@2aeda83a; decorates hudson.Launcher$LocalLauncher@3d701769 will be ignored (a typical symptom is the Git executable not being run inside a designated container)
+Cloning the remote Git repository
+Cloning repository https://github.com/bmv-2143/jenkins-empty-multibranch-app.git
+ > git init /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler # timeout=10
+Fetching upstream changes from https://github.com/bmv-2143/jenkins-empty-multibranch-app.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.5'
+ > git fetch --tags --force --progress -- https://github.com/bmv-2143/jenkins-empty-multibranch-app.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git config remote.origin.url https://github.com/bmv-2143/jenkins-empty-multibranch-app.git # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
+Avoid second fetch
+ > git rev-parse origin/develop^{commit} # timeout=10
+Checking out Revision fce85d8d4121c7845a9e1099b2a8a159da3a6308 (origin/develop)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f fce85d8d4121c7845a9e1099b2a8a159da3a6308 # timeout=10
+Commit message: "chore: add gradle profiler profiling.scenarios"
+ > git rev-list --no-walk fce85d8d4121c7845a9e1099b2a8a159da3a6308 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (run gradle profiler)
+[Pipeline] echo
+Setting up Gradle Profiler...
+[Pipeline] sh
++ chmod +x gradlew
+[Pipeline] echo
+Running Gradle Profiler benchmark...
+[Pipeline] sh
++ gradleprofiler --benchmark --project-dir . --scenario-file profiling.scenarios AssembleDebug
+
+* Writing results to /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler/profile-out
+
+* Settings
+Project dir: /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler/.
+Output dir: /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler/profile-out
+Profiler: none
+Benchmark: true
+Versions: []
+Gradle User Home: /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler/gradle-user-home
+Targets: [AssembleDebug]
+
+* Inspecting the build using its default Gradle version
+Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
+.................................................................................................................................
+
+* Stopping daemons
+
+* Scenarios
+Scenario: assembleDebug Benchmark using Gradle 8.9
+  Gradle 8.9 (/var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler/gradle-user-home/wrapper/dists/gradle-8.9-bin/90cnw93cvbtalezasaz0blq0a/gradle-8.9)
+  Run using: Tooling API
+  Run: run tasks assembleDebug
+  Cleanup: run tasks clean
+  Gradle args: []
+  Jvm args: [-Xmx4g, -XX:+UseParallelGC]
+  Build changes: []
+  Warm-ups: 2
+  Builds: 5
+
+* Running scenario assembleDebug Benchmark using Gradle 8.9 (scenario 1/1)
+
+* Stopping daemons
+
+* Running cleanup for warm-up build #1
+
+* Running warm-up build #1
+Execution time 53876 ms
+
+* Running cleanup for warm-up build #2
+
+* Running warm-up build #2
+Execution time 3665 ms
+
+* Running cleanup for measured build #1
+
+* Running measured build #1
+Execution time 2677 ms
+
+* Running cleanup for measured build #2
+
+* Running measured build #2
+Execution time 2514 ms
+
+* Running cleanup for measured build #3
+
+* Running measured build #3
+Execution time 2371 ms
+
+* Running cleanup for measured build #4
+
+* Running measured build #4
+Execution time 2321 ms
+
+* Running cleanup for measured build #5
+
+* Running measured build #5
+Execution time 2302 ms
+
+* Stopping daemons
+
+* Results written to /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler/profile-out
+  /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler/profile-out/benchmark.csv
+  /var/jenkins_home/workspace/jenkins-homework-pipeline-4-gradle-profiler/profile-out/benchmark.html
+
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Archiving Gradle Profiler reports...
+[Pipeline] archiveArtifacts
+Archiving artifacts
+[Pipeline] echo
+Build completed.
+[Pipeline] echo
+Gradle Profiler run succeeded!
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+$ docker stop --time=1 b3a249810b19a67c3bca9168e58b6aa4169ae5c33579fb49474c86a37e50c9b3
+$ docker rm -f --volumes b3a249810b19a67c3bca9168e58b6aa4169ae5c33579fb49474c86a37e50c9b3
+[Pipeline] // withDockerContainer
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS

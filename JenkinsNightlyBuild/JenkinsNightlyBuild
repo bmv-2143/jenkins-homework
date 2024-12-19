@@ -1,0 +1,56 @@
+pipeline {
+    agent {
+        docker {
+            image 'img-jenkins-agent-android-builder'
+        }
+    }
+
+    triggers {
+        cron('H 0 1 * *')
+    }
+
+    stages {
+        stage('prepare workspace') {
+            steps {
+                echo "Cleaning workspace..."
+                cleanWs()
+            }
+        }
+
+        stage('checkout') {
+            steps {
+                echo "Checking out branch: ${params.branch}"
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "develop"]],
+                    userRemoteConfigs: [[url: 'https://github.com/bmv-2143/jenkins-empty-multibranch-app.git']]
+                ])
+            }
+        }
+
+        stage('run gradle profiler') {
+            steps {
+                echo "Setting up Gradle Profiler..."
+                sh "chmod +x gradlew"
+
+                echo "Running Gradle Profiler benchmark..."
+                sh "gradleprofiler --benchmark --project-dir . --scenario-file profiling.scenarios AssembleDebug"
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Archiving Gradle Profiler reports..."
+            archiveArtifacts(artifacts: '**/profile-out/**', allowEmptyArchive: true)
+            echo "Build completed."
+        }
+        failure {
+            echo "Gradle Profiler run failed!"
+        }
+        success {
+            echo "Gradle Profiler run succeeded!"
+        }
+    }
+}
+
