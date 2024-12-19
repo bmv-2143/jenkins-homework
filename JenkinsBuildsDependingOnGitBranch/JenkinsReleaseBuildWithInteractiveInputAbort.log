@@ -16,7 +16,7 @@ Running on Jenkins
 [Pipeline] withDockerContainer
 Jenkins seems to be running inside container 7d968e8634c0ff101f47f1c7057dffc8bfbc8425edc0d4a1aafb6419bca0b08e
 $ docker run -t -d -u 1000:1000 -w /var/jenkins_home/workspace/jenkins-homework-pipeline-2-branch-dependent-build --volumes-from 7d968e8634c0ff101f47f1c7057dffc8bfbc8425edc0d4a1aafb6419bca0b08e -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** img-jenkins-agent-android-builder cat
-$ docker top 38b2ddf50bb85126685bf25403e172cb50319ee14a45cae1d3810b6d8e85acdb -eo pid,comm
+$ docker top a3d12c2eb07cbc84e33742e2d62171287de890332208df8b0f3c073aeda735b7 -eo pid,comm
 [Pipeline] {
 [Pipeline] stage
 [Pipeline] { (validate parameters)
@@ -43,7 +43,7 @@ Checking out branch: release
 [Pipeline] checkout
 The recommended git tool is: NONE
 No credentials specified
-Warning: JENKINS-30600: special launcher org.jenkinsci.plugins.docker.workflow.WithContainerStep$Decorator$1@1191a51e; decorates hudson.Launcher$LocalLauncher@18e2ed4f will be ignored (a typical symptom is the Git executable not being run inside a designated container)
+Warning: JENKINS-30600: special launcher org.jenkinsci.plugins.docker.workflow.WithContainerStep$Decorator$1@24b36e52; decorates hudson.Launcher$LocalLauncher@2a46eb90 will be ignored (a typical symptom is the Git executable not being run inside a designated container)
 Cloning the remote Git repository
 Cloning repository https://github.com/bmv-2143/jenkins-empty-multibranch-app.git
  > git init /var/jenkins_home/workspace/jenkins-homework-pipeline-2-branch-dependent-build # timeout=10
@@ -55,11 +55,11 @@ Fetching upstream changes from https://github.com/bmv-2143/jenkins-empty-multibr
  > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
 Avoid second fetch
  > git rev-parse refs/remotes/origin/release^{commit} # timeout=10
-Checking out Revision f06201b2ec1260a51f6c66002125213c59c2513f (refs/remotes/origin/release)
+Checking out Revision fce85d8d4121c7845a9e1099b2a8a159da3a6308 (refs/remotes/origin/release)
  > git config core.sparsecheckout # timeout=10
- > git checkout -f f06201b2ec1260a51f6c66002125213c59c2513f # timeout=10
-Commit message: "fix: dummy gradle tasks"
- > git rev-list --no-walk f06201b2ec1260a51f6c66002125213c59c2513f # timeout=10
+ > git checkout -f fce85d8d4121c7845a9e1099b2a8a159da3a6308 # timeout=10
+Commit message: "chore: add gradle profiler profiling.scenarios"
+ > git rev-list --no-walk fce85d8d4121c7845a9e1099b2a8a159da3a6308 # timeout=10
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
@@ -159,7 +159,7 @@ Installing Android SDK Build-Tools 34 in /sdk/build-tools/34.0.0
 > Task :app:processReleaseUnitTestJavaRes
 > Task :app:testReleaseUnitTest
 
-BUILD SUCCESSFUL in 2m 20s
+BUILD SUCCESSFUL in 1m 53s
 23 actionable tasks: 23 executed
 [Pipeline] echo
 Build release...
@@ -187,7 +187,6 @@ Build release...
 > Task :app:compileReleaseJavaWithJavac NO-SOURCE
 > Task :app:extractProguardFiles
 > Task :app:generateReleaseLintVitalReportModel
-> Task :app:lintVitalAnalyzeRelease
 > Task :app:mergeReleaseJniLibFolders
 > Task :app:mergeReleaseNativeLibs NO-SOURCE
 > Task :app:stripReleaseDebugSymbols NO-SOURCE
@@ -217,12 +216,17 @@ Build release...
 > Task :app:compileReleaseArtProfile
 > Task :app:packageRelease
 > Task :app:createReleaseApkListingFileRedirect
+> Task :app:lintVitalAnalyzeRelease
 > Task :app:lintVitalReportRelease
 > Task :app:lintVitalRelease
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 51s
+BUILD SUCCESSFUL in 27s
 44 actionable tasks: 27 executed, 17 up-to-date
+[Pipeline] echo
+Archiving release APK...
+[Pipeline] archiveArtifacts
+Archiving artifacts
 [Pipeline] script
 [Pipeline] {
 [Pipeline] input
@@ -230,6 +234,7 @@ Input requested
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
+
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
@@ -242,12 +247,14 @@ Build completed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
-$ docker stop --time=1 38b2ddf50bb85126685bf25403e172cb50319ee14a45cae1d3810b6d8e85acdb
-$ docker rm -f --volumes 38b2ddf50bb85126685bf25403e172cb50319ee14a45cae1d3810b6d8e85acdb
+$ docker stop --time=1 a3d12c2eb07cbc84e33742e2d62171287de890332208df8b0f3c073aeda735b7
+
+$ docker rm -f --volumes a3d12c2eb07cbc84e33742e2d62171287de890332208df8b0f3c073aeda735b7
+
 [Pipeline] // withDockerContainer
 [Pipeline] }
 [Pipeline] // node
 [Pipeline] End of Pipeline
 Rejected by admin
-org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 6a9b49ab-e281-45b3-a23d-41a37bf6d2db
+org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: c44d6752-2a48-4ebb-b1cd-a03e68b092f4
 Finished: ABORTED

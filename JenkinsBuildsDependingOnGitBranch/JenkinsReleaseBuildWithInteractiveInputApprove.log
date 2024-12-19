@@ -16,7 +16,7 @@ Running on Jenkins
 [Pipeline] withDockerContainer
 Jenkins seems to be running inside container 7d968e8634c0ff101f47f1c7057dffc8bfbc8425edc0d4a1aafb6419bca0b08e
 $ docker run -t -d -u 1000:1000 -w /var/jenkins_home/workspace/jenkins-homework-pipeline-2-branch-dependent-build --volumes-from 7d968e8634c0ff101f47f1c7057dffc8bfbc8425edc0d4a1aafb6419bca0b08e -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** img-jenkins-agent-android-builder cat
-$ docker top 92e3cb0ed1ca978ac5192f26dca065a2cd38c302a337deac06c1ba25ddfef709 -eo pid,comm
+$ docker top 7b9f5f7f1774caf8107a6b2ba11e64f133fc0e25109396e0ffbcf3a4b1210800 -eo pid,comm
 [Pipeline] {
 [Pipeline] stage
 [Pipeline] { (validate parameters)
@@ -43,7 +43,7 @@ Checking out branch: release
 [Pipeline] checkout
 The recommended git tool is: NONE
 No credentials specified
-Warning: JENKINS-30600: special launcher org.jenkinsci.plugins.docker.workflow.WithContainerStep$Decorator$1@3aa43c0; decorates hudson.Launcher$LocalLauncher@5643955d will be ignored (a typical symptom is the Git executable not being run inside a designated container)
+Warning: JENKINS-30600: special launcher org.jenkinsci.plugins.docker.workflow.WithContainerStep$Decorator$1@71e53cb8; decorates hudson.Launcher$LocalLauncher@5a2fcf3c will be ignored (a typical symptom is the Git executable not being run inside a designated container)
 Cloning the remote Git repository
 Cloning repository https://github.com/bmv-2143/jenkins-empty-multibranch-app.git
  > git init /var/jenkins_home/workspace/jenkins-homework-pipeline-2-branch-dependent-build # timeout=10
@@ -55,10 +55,10 @@ Fetching upstream changes from https://github.com/bmv-2143/jenkins-empty-multibr
  > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
 Avoid second fetch
  > git rev-parse refs/remotes/origin/release^{commit} # timeout=10
-Checking out Revision f06201b2ec1260a51f6c66002125213c59c2513f (refs/remotes/origin/release)
+Checking out Revision fce85d8d4121c7845a9e1099b2a8a159da3a6308 (refs/remotes/origin/release)
  > git config core.sparsecheckout # timeout=10
- > git checkout -f f06201b2ec1260a51f6c66002125213c59c2513f # timeout=10
-Commit message: "fix: dummy gradle tasks"
+ > git checkout -f fce85d8d4121c7845a9e1099b2a8a159da3a6308 # timeout=10
+Commit message: "chore: add gradle profiler profiling.scenarios"
  > git rev-list --no-walk f06201b2ec1260a51f6c66002125213c59c2513f # timeout=10
 [Pipeline] }
 [Pipeline] // stage
@@ -145,8 +145,8 @@ Installing Android SDK Build-Tools 34 in /sdk/build-tools/34.0.0
 > Task :app:processReleaseMainManifest
 > Task :app:processReleaseManifest
 > Task :app:preReleaseUnitTestBuild UP-TO-DATE
-> Task :app:javaPreCompileRelease
 > Task :app:javaPreCompileReleaseUnitTest
+> Task :app:javaPreCompileRelease
 > Task :app:processReleaseManifestForPackage
 > Task :app:processReleaseResources
 > Task :app:compileReleaseKotlin
@@ -159,7 +159,7 @@ Installing Android SDK Build-Tools 34 in /sdk/build-tools/34.0.0
 > Task :app:processReleaseUnitTestJavaRes
 > Task :app:testReleaseUnitTest
 
-BUILD SUCCESSFUL in 2m 7s
+BUILD SUCCESSFUL in 1m 49s
 23 actionable tasks: 23 executed
 [Pipeline] echo
 Build release...
@@ -196,7 +196,6 @@ Build release...
 > Task :app:dexBuilderRelease
 > Task :app:desugarReleaseFileDependencies
 > Task :app:mergeReleaseStartupProfile
-> Task :app:lintVitalAnalyzeRelease
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseGlobalSynthetics
 > Task :app:mergeReleaseShaders
@@ -217,12 +216,17 @@ Build release...
 > Task :app:compileReleaseArtProfile
 > Task :app:packageRelease
 > Task :app:createReleaseApkListingFileRedirect
+> Task :app:lintVitalAnalyzeRelease
 > Task :app:lintVitalReportRelease
 > Task :app:lintVitalRelease
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 38s
+BUILD SUCCESSFUL in 28s
 44 actionable tasks: 27 executed, 17 up-to-date
+[Pipeline] echo
+Archiving release APK...
+[Pipeline] archiveArtifacts
+Archiving artifacts
 [Pipeline] script
 [Pipeline] {
 [Pipeline] input
@@ -230,21 +234,19 @@ Input requested
 Approved by admin
 
 [Pipeline] echo
-Release approved by: Mike
+Release approved by: misha
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] echo
 Upload release to Play store...
 [Pipeline] sh
-
 + ./gradlew uploadToGooglePlayStore
-
 
 > Task :app:uploadToGooglePlayStore
 Upload to Google Play started ...
 Upload to Google Play: SUCCESS!
 
-BUILD SUCCESSFUL in 754ms
+BUILD SUCCESSFUL in 641ms
 1 actionable task: 1 executed
 [Pipeline] }
 [Pipeline] // stage
@@ -261,10 +263,8 @@ Build succeeded!
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
-$ docker stop --time=1 92e3cb0ed1ca978ac5192f26dca065a2cd38c302a337deac06c1ba25ddfef709
-
-$ docker rm -f --volumes 92e3cb0ed1ca978ac5192f26dca065a2cd38c302a337deac06c1ba25ddfef709
-
+$ docker stop --time=1 7b9f5f7f1774caf8107a6b2ba11e64f133fc0e25109396e0ffbcf3a4b1210800
+$ docker rm -f --volumes 7b9f5f7f1774caf8107a6b2ba11e64f133fc0e25109396e0ffbcf3a4b1210800
 [Pipeline] // withDockerContainer
 [Pipeline] }
 [Pipeline] // node

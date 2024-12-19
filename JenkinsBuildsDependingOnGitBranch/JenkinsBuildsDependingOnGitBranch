@@ -76,6 +76,9 @@ pipeline {
                 echo "Build develop..."
                 sh "./gradlew assembleDebug"
 
+                echo "Archiving debug APK..."
+                archiveArtifacts artifacts: 'app/build/outputs/apk/debug/*.apk', allowEmptyArchive: true
+
                 echo "Upload development build to internal testers..."
                 sh "./gradlew uploadToTelegramForInternalTesting"
             }
@@ -92,6 +95,9 @@ pipeline {
                 echo "Build release..."
                 sh "./gradlew assembleRelease"
 
+                echo "Archiving release APK..."
+                archiveArtifacts artifacts: 'app/build/outputs/apk/release/*.apk', allowEmptyArchive: true
+
                 script {
                     def releaseManager = input(
                             message: "Confirm release upload to Play Store",
@@ -102,8 +108,6 @@ pipeline {
                     )
                     echo "Release approved by: ${releaseManager}"
                 }
-
-
 
                 echo "Upload release to Play store..."
                 sh "./gradlew uploadToGooglePlayStore"
