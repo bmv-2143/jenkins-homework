@@ -24,3 +24,11 @@ docker run -p 8080:8080 -p 50000:50000 -v $HOME/develop/jenkins:/var/jenkins_hom
 ## 5. Run Jenkins pipeline build
 Build artifacts should be located at:
 `$HOME/develop/jenkins/workspace/jenkins-homework-pipeline-1/app/build`
+
+## 6. Branch-Dependent Build
+If you select the "release" branch (`JenkinsBuildsDependingOnGitBranch/JenkinsBuildsDependingOnGitBranch`) when the 
+script starts, it will ask for confirmation (see "Input requested" in the console logs) before executing the 
+task to publish to Google Play.
+
+## 7. Gradle Profiler Nightly Builds
+You must run the script once (`JenkinsNightlyBuild/JenkinsNightlyBuild`) before it is scheduled for the configured time.
